@@ -3,189 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Digital Pest Control - BPP Bola</title>
+  <title>Simulasi Tikus - BPP Bola</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     :root { 
-      /* Mode Gelap - Palet Warna */
-      --bg-body: #121212;
-      --bg-card: #1e1e1e;
-      --bg-input: #2d2d2d;
-      --text-main: #e0e0e0;
-      --text-muted: #a0a0a0;
-      --border-color: #333333;
-      
-      --primary: #81c784; /* Hijau lebih terang untuk dark mode */
-      --secondary: #66bb6a;
-      --danger: #ef5350; /* Merah lebih terang */
-      --warning: #ffb74d; /* Oranye lebih terang */
-      --white: #ffffff;
+      --bg-body: #121212; --bg-card: #1e1e1e; --bg-input: #2d2d2d;
+      --text-main: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333;
+      --primary: #81c784; --secondary: #66bb6a; --danger: #ef5350; --warning: #ffb74d;
     }
-
-    body { 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-      background-color: var(--bg-body); 
-      margin: 0; 
-      padding: 15px; 
-      color: var(--text-main);
-    }
-
+    body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-body); margin: 0; padding: 15px; color: var(--text-main); }
     .container { max-width: 850px; margin: auto; }
-
-    /* Gaya Judul Utama Baru */
-    .main-header {
-      text-align: center;
-      margin-bottom: 25px;
-      padding: 10px;
+    
+    /* Tombol Home */
+    .home-btn {
+      position: absolute; top: 15px; left: 15px;
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      color: var(--primary); padding: 10px 15px; border-radius: 10px;
+      text-decoration: none; font-size: 1.2rem; transition: 0.3s;
     }
+    .home-btn:hover { background: var(--primary); color: #121212; }
 
-    .main-header h1 {
-      color: var(--primary);
-      margin: 0;
-      font-size: 1.2rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .main-header p {
-      color: var(--text-muted);
-      margin: 5px 0 0 0;
-      font-size: 0.7rem;
-    }
-
-    .card {
-      background: var(--bg-card);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      border: 1px solid var(--border-color);
-    }
-
-    h2 { 
-      color: var(--primary); 
-      margin: 0 0 15px 0;
-      display: flex; 
-      align-items: center; 
-      gap: 12px;
-      font-size: 1.1rem;
-    }
-
-    .grid-input { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
-      gap: 15px; 
-      margin-bottom: 15px;
-    }
-
+    .main-header { text-align: center; margin-bottom: 25px; padding-top: 40px; }
+    .main-header h1 { color: var(--primary); margin: 0; font-size: 1.2rem; font-weight: 800; text-transform: uppercase; }
+    .main-header p { color: var(--text-muted); margin: 5px 0 0 0; font-size: 0.7rem; }
+    .card { background: var(--bg-card); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    h2 { color: var(--primary); margin: 0 0 15px 0; display: flex; align-items: center; gap: 12px; font-size: 1.1rem; }
+    .grid-input { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 15px; }
     .input-group { display: flex; flex-direction: column; }
-    
-    label { 
-      font-weight: 600; 
-      font-size: 0.85rem; 
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-
-    select, input { 
-      padding: 12px; 
-      border: 2px solid var(--border-color); 
-      border-radius: 10px; 
-      outline: none;
-      font-size: 1rem;
-      background-color: var(--bg-input);
-      color: var(--text-main);
-      transition: all 0.3s;
-    }
-
-    /* Penyesuaian ikon kalender agar terlihat di dark mode */
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(1);
-    }
-
-    select:focus, input:focus { border-color: var(--primary); background: #252525; }
-
-    .input-error { border-color: var(--danger) !important; background-color: #3a1c1c !important; }
-
+    label { font-weight: 600; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
+    select, input { padding: 12px; border: 2px solid var(--border-color); border-radius: 10px; outline: none; background-color: var(--bg-input); color: var(--text-main); }
     .full-width { grid-column: 1 / -1; }
-
-    button { 
-      background: var(--primary); 
-      color: #121212; /* Teks gelap di tombol terang */
-      padding: 15px; 
-      border: none; 
-      border-radius: 10px; 
-      cursor: pointer; 
-      width: 100%;
-      font-weight: bold;
-      font-size: 1rem;
-      box-shadow: 0 4px 12px rgba(129, 199, 132, 0.2);
-      transition: all 0.3s;
-    }
-
+    button { background: var(--primary); color: #121212; padding: 15px; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s; }
     button:hover { background: var(--secondary); transform: translateY(-2px); }
-
-    .info-box { 
-      background: #1a2e1c; /* Hijau sangat tua untuk background info */
-      padding: 18px; 
-      border-radius: 12px; 
-      margin-top: 20px; 
-      border-left: 6px solid var(--primary);
-      color: var(--text-main);
-    }
-
-    .status-badge {
-      padding: 5px 12px;
-      border-radius: 30px;
-      color: #121212;
-      font-weight: 800;
-      font-size: 0.8rem;
-    }
-
-    .table-container { overflow-x: auto; margin-top: 15px; }
-    
-    table { border-collapse: collapse; width: 100%; min-width: 550px; color: var(--text-main); }
-    th { background: #252525; color: var(--text-muted); font-size: 0.7rem; padding: 12px; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
-    td { padding: 14px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
-
-    /* Gaya khusus baris kritikal & penanaman disesuaikan untuk dark mode */
-    .critical-row { background-color: #3a1c1c !important; color: #ff8a80; font-weight: 600; }
-    .planting-row { color: var(--primary); font-weight: 800; background-color: #1a2e1c !important; }
-    
-    .chart-container {
-      position: relative;
-      margin-top: 20px;
-      height: 220px;
-      width: 100%;
-    }
-
-    .footer { 
-      text-align: center; 
-      color: var(--text-muted); 
-      font-size: 0.85rem; 
-      margin-top: 30px; 
-      padding: 20px 0;
-      border-top: 1px dashed var(--border-color);
-      line-height: 1.6;
-    }
+    .info-box { background: #1a2e1c; padding: 18px; border-radius: 12px; margin-top: 20px; border-left: 6px solid var(--primary); }
+    .status-badge { padding: 5px 12px; border-radius: 30px; color: #121212; font-weight: 800; font-size: 0.8rem; }
+    .chart-container { position: relative; margin-top: 20px; height: 220px; width: 100%; }
+    .footer { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 30px; padding: 20px 0; border-top: 1px dashed var(--border-color); }
   </style>
 </head>
 <body>
-
 <div class="container">
+  <a href="https://mamank757.github.io/petani" class="home-btn"><i class="fas fa-home"></i></a>
+  
   <div class="main-header">
-    <h1>Pengendalian Tikus</h1>
-    <p>Aplikasi Simulasi Monitoring Tikus Sawah & Jadwal Tindakan Pengendalian</p>
+    <h1>Simulasi Populasi Tikus</h1>
+    <p>Monitoring & Prediksi Ledakan Hama Tikus Sawah</p>
   </div>
 
   <div class="card">
-    <h2><i class="fas fa-chart-line"></i> Simulasi Populasi Tikus</h2>
-    
+    <h2><i class="fas fa-chart-line"></i> Simulasi</h2>
     <div class="grid-input">
       <div class="input-group full-width">
-        <label>Pilih Kondisi Lahan (Skenario):</label>
+         <label>Pilih Kondisi Lahan (Skenario):</label>
         <select id="skenario" onchange="updateBySkenario()">
           <option value="alami">🔴 Tanpa Pengendalian (Risiko Ledakan Tinggi)</option>
           <option value="setelah_tanam">🟠 Pengendalian Setelah Tanam (Racun/Perangkap Rutin)</option>
@@ -193,10 +63,9 @@
           <option value="pht">🟢 Pengendalian Terpadu (PHT - Strategi Lengkap)</option>
         </select>
       </div>
-
       <div class="input-group">
         <label>Masukkan Luas Lahan (ha)</label>
-        <input type="number" id="luas" placeholder="Contoh: 0.5" min="0" step="any">
+        <input type="number" id="luas" placeholder="0.5" step="any">
       </div>
       <div class="input-group">
         <label>Laju Pertumbuhan Tikus (r)</label>
@@ -204,196 +73,63 @@
       </div>
       <div class="input-group">
         <label>Durasi (minggu)</label>
-        <input type="number" id="t" value="16" min="1">
+        <input type="number" id="t" value="16">
       </div>
       <div class="input-group">
-        <label>Efikasi Kendali (%)</label>
+        <label>Efikasi Pengendalian (%)</label>
         <input type="number" id="kill" value="5">
       </div>
     </div>
-
-    <button onclick="jalankanSimulasi()"><i class="fas fa-play-circle"></i> Hitung Proyeksi Populasi Tikus</button>
-    
+    <button onclick="jalankanSimulasi()"><i class="fas fa-play-circle"></i> Hitung Proyeksi</button>
     <div id="hasilSimulasi" class="info-box" style="display:none"></div>
-    
-    <div class="chart-container">
-      <canvas id="ratChart"></canvas>
-    </div>
+    <div class="chart-container"><canvas id="ratChart"></canvas></div>
   </div>
 
-  <div class="card">
-    <h2><i class="fas fa-calendar-check"></i> Jadwal Rencana Tindakan Pengendalian</h2>
-    <div class="input-group">
-      <label>Rencana Tanggal Tanam Padi:</label>
-      <input type="date" id="tglTanam" onchange="generateKalender()">
-    </div>
-
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Minggu</th>
-            <th>Jadwal</th>
-            <th>Tindakan Rekomendasi PPL</th>
-          </tr>
-        </thead>
-        <tbody id="tabelKalender">
-          <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Pilih tanggal tanam untuk melihat jadwal</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="footer">
-    © 2026 Dibuat oleh:<br>
-    <strong>King Mamank</strong> • PPL BPP Bola - Kab. Wajo - Sulsel
-  </div>
+  <div class="footer">© 2026 King Mamank • PPL BPP Bola - Kab. Wajo</div>
 </div>
 
 <script>
 let myChart;
-
-// Konfigurasi Global Chart.js untuk Dark Mode
-Chart.defaults.color = '#a0a0a0'; // Warna teks grid/label
-Chart.defaults.scale.grid.color = '#333333'; // Warna garis grid
+Chart.defaults.color = '#a0a0a0';
+Chart.defaults.scale.grid.color = '#333333';
 
 function updateBySkenario() {
-  const skenario = document.getElementById('skenario').value;
-  const rInput = document.getElementById('r');
-  const killInput = document.getElementById('kill');
-
-  switch (skenario) {
-    case 'alami':
-      rInput.value = 0.9;
-      killInput.value = 5; 
-      break;
-    case 'sebelum_olah':
-      rInput.value = 0.75;
-      killInput.value = 35;
-      break;
-    case 'setelah_tanam':
-      rInput.value = 0.6;
-      killInput.value = 25;
-      break;
-    case 'pht':
-      rInput.value = 0.3;
-      killInput.value = 60;
-      break;
-  }
+  const s = document.getElementById('skenario').value;
+  const r = document.getElementById('r'); const k = document.getElementById('kill');
+  if(s=='alami'){ r.value=0.9; k.value=5; }
+  else if(s=='sebelum_olah'){ r.value=0.75; k.value=35; }
+  else if(s=='setelah_tanam'){ r.value=0.6; k.value=25; }
+  else { r.value=0.3; k.value=60; }
 }
 
 function jalankanSimulasi() {
-  const luasInput = document.getElementById('luas');
-  const luas = parseFloat(luasInput.value);
+  const luas = parseFloat(document.getElementById('luas').value);
   const r = parseFloat(document.getElementById('r').value);
   const t = parseInt(document.getElementById('t').value);
   const kill = parseFloat(document.getElementById('kill').value) / 100;
-
-  luasInput.classList.remove('input-error');
-
-  if (isNaN(luas) || luas <= 0) {
-    luasInput.classList.add('input-error');
-    luasInput.focus();
-    return alert("⚠️ Peringatan: Luas lahan tidak boleh 0 atau kosong.");
-  }
-
-  const nAwalPerHa = 6; 
-  const nMaksPerHa = 500; 
-  let k = luas * nMaksPerHa;
-  let Nt = luas * nAwalPerHa;
-
-  let dataPopulasi = [];
-  let labels = [];
-
+  if (isNaN(luas) || luas <= 0) return alert("Masukkan luas lahan!");
+  
+  let k = luas * 500; let Nt = luas * 6;
+  let dataPop = []; let labels = [];
   for (let i = 0; i <= t; i++) {
-    labels.push("Mg-" + i);
-    dataPopulasi.push(Math.round(Nt));
-    let populasi_setelah_kendali = Nt * (1 - kill);
-    let pertumbuhan = r * populasi_setelah_kendali * (1 - (populasi_setelah_kendali / k));
-    let imigrasi = 0.5 * luas; 
-    Nt = populasi_setelah_kendali + pertumbuhan + imigrasi;
+    labels.push("Mg-" + i); dataPop.push(Math.round(Nt));
+    let n_kendali = Nt * (1 - kill);
+    Nt = n_kendali + (r * n_kendali * (1 - (n_kendali / k))) + (0.5 * luas);
     if (Nt > k) Nt = k;
-    if (Nt < 1) Nt = 1;
   }
-
-  const box = document.getElementById('hasilSimulasi');
-  box.style.display = 'block';
-  let status, warna, warnaTeksBadge;
-  const akhir = dataPopulasi[dataPopulasi.length - 1];
-
-  // Penyesuaian warna indikator untuk dark mode (ef5350 = danger, ffb74d = warning, 81c784 = primary)
-  if (akhir > 0.5 * k) { status = "BAHAYA"; warna = "#ef5350"; }
-  else if (akhir > 0.15 * k) { status = "WASPADA"; warna = "#ffb74d"; }
-  else { status = "AMAN"; warna = "#81c784"; }
-
+  const box = document.getElementById('hasilSimulasi'); box.style.display = 'block';
+  let akhir = dataPop[dataPop.length-1]; let s, w;
+  if (akhir > 0.5 * k) { s = "BAHAYA"; w = "#ef5350"; }
+  else if (akhir > 0.15 * k) { s = "WASPADA"; w = "#ffb74d"; }
+  else { s = "AMAN"; w = "#81c784"; }
   box.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;">
-      <span>Populasi Akhir: <b>${akhir}</b> ekor</span>
-      <span class="status-badge" style="background:${warna}; color:#121212;">${status}</span>
-    </div>`;
-
+    <span>Populasi Akhir: <b>${akhir}</b> ekor</span>
+    <span class="status-badge" style="background:${w}">${s}</span>
+  </div>`;
   if (myChart) myChart.destroy();
-  const ctx = document.getElementById('ratChart').getContext('2d');
-  myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Ekor',
-        data: dataPopulasi,
-        borderColor: warna, // Warna garis mengikuti status akhir
-        backgroundColor: warna + '15', // Fill transparan
-        fill: true,
-        tension: 0.4,
-        borderWidth: 2,
-        pointRadius: 2
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { 
-        y: { beginAtZero: true, suggestedMax: k + 10, ticks: { maxTicksLimit: 5 } },
-        x: { ticks: { font: { size: 10 } } }
-      }
-    }
-  });
-}
-
-function generateKalender() {
-  const tgl = document.getElementById('tglTanam').value;
-  if (!tgl) return;
-  const tglObj = new Date(tgl);
-  const listKegiatan = [
-    "Gropyokan, Pasang Umpan/Bongkar Lubang Aktif", "Sanitasi Pematang/Saluran Irigasi", "Olah Tanah",
-    "PENANAMAN SEREMPAK", "Pasang Trap Barrier System (TBS)", "Monitoring Jejak & Umpan Segar",
-    "Fumigasi Sarang (Emposan)", "Sanitasi Gulma Rutin", "WASPADA: Fase Bunting Padi",
-    "Pengendalian Intensif (Umpan Beracun)", "Puncak Kerawanan (Lindungi Malai)", "Monitoring Menjelang Panen",
-    "PANEN & Bersihkan Sisa Jerami", "Gropyokan Pasca Panen", "Bongkar Habitat Sisa"
-  ];
-
-  const tbody = document.getElementById('tabelKalender');
-  tbody.innerHTML = '';
-  listKegiatan.forEach((teks, i) => {
-    let d = new Date(tglObj);
-    d.setDate(tglObj.getDate() + (i - 3) * 7);
-    let row = tbody.insertRow();
-    row.insertCell(0).innerHTML = `<b>Mg ${i + 1}</b>`;
-    row.insertCell(1).innerText = d.toLocaleDateString('id-ID', {day:'2-digit', month:'long'});
-    let cellKeg = row.insertCell(2);
-    
-    if (teks === "PENANAMAN SEREMPAK") {
-      row.className = 'planting-row';
-      cellKeg.innerHTML = `<i class="fas fa-seedling"></i> ${teks}`;
-    } else {
-      cellKeg.innerText = teks;
-    }
-
-    // Gunakan warna danger dark mode untuk fase kritikal
-    if (i >= 8 && i <= 10) { 
-      row.className = 'critical-row'; 
-      cellKeg.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${teks}`; 
-    }
+  myChart = new Chart(document.getElementById('ratChart'), {
+    type: 'line', data: { labels, datasets: [{ label: 'Ekor', data: dataPop, borderColor: w, backgroundColor: w + '15', fill: true, tension: 0.4 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
   });
 }
 </script>
