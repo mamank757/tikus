@@ -3,36 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulasi Tikus Digital - BPP Bola</title>
+  <title>Digital Pest Control - BPP Bola</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     :root { 
-      --primary: #2e7d32; 
-      --secondary: #1b5e20;
-      --danger: #d32f2f;
-      --warning: #ffa000;
-      --bg: #f4f7f6; 
+      /* Mode Gelap - Palet Warna */
+      --bg-body: #121212;
+      --bg-card: #1e1e1e;
+      --bg-input: #2d2d2d;
+      --text-main: #e0e0e0;
+      --text-muted: #a0a0a0;
+      --border-color: #333333;
+      
+      --primary: #81c784; /* Hijau lebih terang untuk dark mode */
+      --secondary: #66bb6a;
+      --danger: #ef5350; /* Merah lebih terang */
+      --warning: #ffb74d; /* Oranye lebih terang */
       --white: #ffffff;
     }
 
     body { 
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-      background-color: var(--bg); 
+      background-color: var(--bg-body); 
       margin: 0; 
       padding: 15px; 
-      color: #333;
+      color: var(--text-main);
     }
 
     .container { max-width: 850px; margin: auto; }
 
+    /* Gaya Judul Utama Baru */
+    .main-header {
+      text-align: center;
+      margin-bottom: 25px;
+      padding: 10px;
+    }
+
+    .main-header h1 {
+      color: var(--primary);
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .main-header p {
+      color: var(--text-muted);
+      margin: 5px 0 0 0;
+      font-size: 0.8rem;
+    }
+
     .card {
-      background: var(--white);
+      background: var(--bg-card);
       border-radius: 16px;
       padding: 20px;
       margin-bottom: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-      border: 1px solid #e0e6ed;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      border: 1px solid var(--border-color);
     }
 
     h2 { 
@@ -41,7 +70,7 @@
       display: flex; 
       align-items: center; 
       gap: 12px;
-      font-size: 1.3rem;
+      font-size: 1.1rem;
     }
 
     .grid-input { 
@@ -56,29 +85,35 @@
     label { 
       font-weight: 600; 
       font-size: 0.85rem; 
-      color: #555;
+      color: var(--text-muted);
       margin-bottom: 6px;
     }
 
     select, input { 
       padding: 12px; 
-      border: 2px solid #edf2f7; 
+      border: 2px solid var(--border-color); 
       border-radius: 10px; 
       outline: none;
       font-size: 1rem;
+      background-color: var(--bg-input);
+      color: var(--text-main);
       transition: all 0.3s;
     }
 
-    select:focus, input:focus { border-color: var(--primary); background: #f9fff9; }
+    /* Penyesuaian ikon kalender agar terlihat di dark mode */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+    }
 
-    /* Gaya untuk input saat error */
-    .input-error { border-color: var(--danger) !important; background-color: #fff5f5 !important; }
+    select:focus, input:focus { border-color: var(--primary); background: #252525; }
+
+    .input-error { border-color: var(--danger) !important; background-color: #3a1c1c !important; }
 
     .full-width { grid-column: 1 / -1; }
 
     button { 
       background: var(--primary); 
-      color: white; 
+      color: #121212; /* Teks gelap di tombol terang */
       padding: 15px; 
       border: none; 
       border-radius: 10px; 
@@ -86,35 +121,38 @@
       width: 100%;
       font-weight: bold;
       font-size: 1rem;
-      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+      box-shadow: 0 4px 12px rgba(129, 199, 132, 0.2);
       transition: all 0.3s;
     }
 
     button:hover { background: var(--secondary); transform: translateY(-2px); }
 
     .info-box { 
-      background: #f0fdf4; 
+      background: #1a2e1c; /* Hijau sangat tua untuk background info */
       padding: 18px; 
       border-radius: 12px; 
       margin-top: 20px; 
       border-left: 6px solid var(--primary);
+      color: var(--text-main);
     }
 
     .status-badge {
       padding: 5px 12px;
       border-radius: 30px;
-      color: white;
+      color: #121212;
       font-weight: 800;
       font-size: 0.8rem;
     }
 
     .table-container { overflow-x: auto; margin-top: 15px; }
     
-    table { border-collapse: collapse; width: 100%; min-width: 550px; }
-    th { background: #f8fafc; color: #64748b; font-size: 0.7rem; padding: 12px; text-transform: uppercase; }
-    td { padding: 14px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+    table { border-collapse: collapse; width: 100%; min-width: 550px; color: var(--text-main); }
+    th { background: #252525; color: var(--text-muted); font-size: 0.7rem; padding: 12px; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+    td { padding: 14px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
 
-    .critical-row { background-color: #fff5f5 !important; color: #c53030; font-weight: 600; }
+    /* Gaya khusus baris kritikal & penanaman disesuaikan untuk dark mode */
+    .critical-row { background-color: #3a1c1c !important; color: #ff8a80; font-weight: 600; }
+    .planting-row { color: var(--primary); font-weight: 800; background-color: #1a2e1c !important; }
     
     .chart-container {
       position: relative;
@@ -123,12 +161,25 @@
       width: 100%;
     }
 
-    .footer { text-align: center; color: #94a3b8; font-size: 0.8rem; margin-top: 20px; }
+    .footer { 
+      text-align: center; 
+      color: var(--text-muted); 
+      font-size: 0.85rem; 
+      margin-top: 30px; 
+      padding: 20px 0;
+      border-top: 1px dashed var(--border-color);
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
+  <div class="main-header">
+    <h1>Asisten Pengendalian tikus</h1>
+    <p>Aplikasi Simulasi Monitoring Tikus Sawah & Jadwal Tindakan Pengendalian</p>
+  </div>
+
   <div class="card">
     <h2><i class="fas fa-chart-line"></i> Simulasi Populasi Tikus</h2>
     
@@ -161,7 +212,7 @@
       </div>
     </div>
 
-    <button onclick="jalankanSimulasi()"><i class="fas fa-play-circle"></i> Hitung Proyeksi Hama</button>
+    <button onclick="jalankanSimulasi()"><i class="fas fa-play-circle"></i> Hitung Proyeksi Populasi Tikus</button>
     
     <div id="hasilSimulasi" class="info-box" style="display:none"></div>
     
@@ -171,9 +222,9 @@
   </div>
 
   <div class="card">
-    <h2><i class="fas fa-calendar-check"></i> Rencana Tindakan Lapangan</h2>
+    <h2><i class="fas fa-calendar-check"></i> Jadwal Rencana Tindakan Pengendalian</h2>
     <div class="input-group">
-      <label>Tanggal Mulai Tanam:</label>
+      <label>Rencana Tanggal Tanam Padi:</label>
       <input type="date" id="tglTanam" onchange="generateKalender()">
     </div>
 
@@ -182,22 +233,29 @@
         <thead>
           <tr>
             <th>Minggu</th>
-            <th>Estimasi Tanggal</th>
+            <th>Jadwal</th>
             <th>Tindakan Rekomendasi PPL</th>
           </tr>
         </thead>
         <tbody id="tabelKalender">
-          <tr><td colspan="3" style="text-align:center; color:#aaa;">Pilih tanggal tanam untuk melihat jadwal</td></tr>
+          <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Pilih tanggal tanam untuk melihat jadwal</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="footer">Digital Tool PPL - Kecamatan Bola, Kab. Wajo</div>
+  <div class="footer">
+    © 2026 Dibuat oleh:<br>
+    <strong>King Mamank</strong> • PPL BPP Bola - Kab. Wajo - Sulsel
+  </div>
 </div>
 
 <script>
 let myChart;
+
+// Konfigurasi Global Chart.js untuk Dark Mode
+Chart.defaults.color = '#a0a0a0'; // Warna teks grid/label
+Chart.defaults.scale.grid.color = '#333333'; // Warna garis grid
 
 function updateBySkenario() {
   const skenario = document.getElementById('skenario').value;
@@ -231,17 +289,13 @@ function jalankanSimulasi() {
   const t = parseInt(document.getElementById('t').value);
   const kill = parseFloat(document.getElementById('kill').value) / 100;
 
-  // Reset status error
   luasInput.classList.remove('input-error');
 
-  // Validasi Luas Lahan (Peringatan jika 0, kosong, atau negatif)
   if (isNaN(luas) || luas <= 0) {
     luasInput.classList.add('input-error');
     luasInput.focus();
-    return alert("⚠️ Peringatan: Luas lahan tidak boleh 0 atau kosong. Masukkan nilai luas lahan yang valid (misalnya: 0.5 atau 1).");
+    return alert("⚠️ Peringatan: Luas lahan tidak boleh 0 atau kosong.");
   }
-
-  if (!r || !t) return alert("Mohon lengkapi data laju pertumbuhan dan durasi!");
 
   const nAwalPerHa = 6; 
   const nMaksPerHa = 500; 
@@ -254,29 +308,27 @@ function jalankanSimulasi() {
   for (let i = 0; i <= t; i++) {
     labels.push("Mg-" + i);
     dataPopulasi.push(Math.round(Nt));
-
     let populasi_setelah_kendali = Nt * (1 - kill);
     let pertumbuhan = r * populasi_setelah_kendali * (1 - (populasi_setelah_kendali / k));
     let imigrasi = 0.5 * luas; 
-
     Nt = populasi_setelah_kendali + pertumbuhan + imigrasi;
-
     if (Nt > k) Nt = k;
     if (Nt < 1) Nt = 1;
   }
 
   const box = document.getElementById('hasilSimulasi');
   box.style.display = 'block';
-  let status, warna;
+  let status, warna, warnaTeksBadge;
   const akhir = dataPopulasi[dataPopulasi.length - 1];
 
-  if (akhir > 0.5 * k) { status = "BAHAYA"; warna = "#d32f2f"; }
-  else if (akhir > 0.15 * k) { status = "WASPADA"; warna = "#ffa000"; }
-  else { status = "AMAN"; warna = "#2e7d32"; }
+  // Penyesuaian warna indikator untuk dark mode (ef5350 = danger, ffb74d = warning, 81c784 = primary)
+  if (akhir > 0.5 * k) { status = "BAHAYA"; warna = "#ef5350"; }
+  else if (akhir > 0.15 * k) { status = "WASPADA"; warna = "#ffb74d"; }
+  else { status = "AMAN"; warna = "#81c784"; }
 
   box.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;">
       <span>Populasi Akhir: <b>${akhir}</b> ekor</span>
-      <span class="status-badge" style="background:${warna}">${status}</span>
+      <span class="status-badge" style="background:${warna}; color:#121212;">${status}</span>
     </div>`;
 
   if (myChart) myChart.destroy();
@@ -288,8 +340,8 @@ function jalankanSimulasi() {
       datasets: [{
         label: 'Ekor',
         data: dataPopulasi,
-        borderColor: warna,
-        backgroundColor: warna + '15',
+        borderColor: warna, // Warna garis mengikuti status akhir
+        backgroundColor: warna + '15', // Fill transparan
         fill: true,
         tension: 0.4,
         borderWidth: 2,
@@ -313,7 +365,7 @@ function generateKalender() {
   if (!tgl) return;
   const tglObj = new Date(tgl);
   const listKegiatan = [
-    "Gropyokan & Bongkar Lubang Aktif", "Sanitasi Pematang/Saluran Irigasi", "Olah Tanah & Penggenangan Sarang",
+    "Gropyokan, Pasang Umpan/Bongkar Lubang Aktif", "Sanitasi Pematang/Saluran Irigasi", "Olah Tanah",
     "PENANAMAN SEREMPAK", "Pasang Trap Barrier System (TBS)", "Monitoring Jejak & Umpan Segar",
     "Fumigasi Sarang (Emposan)", "Sanitasi Gulma Rutin", "WASPADA: Fase Bunting Padi",
     "Pengendalian Intensif (Umpan Beracun)", "Puncak Kerawanan (Lindungi Malai)", "Monitoring Menjelang Panen",
@@ -329,7 +381,15 @@ function generateKalender() {
     row.insertCell(0).innerHTML = `<b>Mg ${i + 1}</b>`;
     row.insertCell(1).innerText = d.toLocaleDateString('id-ID', {day:'2-digit', month:'long'});
     let cellKeg = row.insertCell(2);
-    cellKeg.innerText = teks;
+    
+    if (teks === "PENANAMAN SEREMPAK") {
+      row.className = 'planting-row';
+      cellKeg.innerHTML = `<i class="fas fa-seedling"></i> ${teks}`;
+    } else {
+      cellKeg.innerText = teks;
+    }
+
+    // Gunakan warna danger dark mode untuk fase kritikal
     if (i >= 8 && i <= 10) { 
       row.className = 'critical-row'; 
       cellKeg.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${teks}`; 
