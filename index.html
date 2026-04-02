@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulasi Tikus Digital - BPP Bola</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root { 
+      --primary: #2e7d32; 
+      --secondary: #1b5e20;
+      --danger: #d32f2f;
+      --warning: #ffa000;
+      --bg: #f4f7f6; 
+      --white: #ffffff;
+    }
+
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      background-color: var(--bg); 
+      margin: 0; 
+      padding: 15px; 
+      color: #333;
+    }
+
+    .container { max-width: 850px; margin: auto; }
+
+    .card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      border: 1px solid #e0e6ed;
+    }
+
+    h2 { 
+      color: var(--primary); 
+      margin-top: 0; 
+      display: flex; 
+      align-items: center; 
+      gap: 12px;
+      font-size: 1.3rem;
+    }
+
+    .grid-input { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+      gap: 15px; 
+      margin-bottom: 15px;
+    }
+
+    .input-group { display: flex; flex-direction: column; }
+    
+    label { 
+      font-weight: 600; 
+      font-size: 0.85rem; 
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    select, input { 
+      padding: 12px; 
+      border: 2px solid #edf2f7; 
+      border-radius: 10px; 
+      outline: none;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    select:focus, input:focus { border-color: var(--primary); background: #f9fff9; }
+
+    .full-width { grid-column: 1 / -1; }
+
+    button { 
+      background: var(--primary); 
+      color: white; 
+      padding: 15px; 
+      border: none; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      width: 100%;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+      transition: all 0.3s;
+    }
+
+    button:hover { background: var(--secondary); transform: translateY(-2px); }
+    button:active { transform: translateY(0); }
+
+    .info-box { 
+      background: #f0fdf4; 
+      padding: 18px; 
+      border-radius: 12px; 
+      margin-top: 20px; 
+      border-left: 6px solid var(--primary);
+    }
+
+    .status-badge {
+      padding: 5px 12px;
+      border-radius: 30px;
+      color: white;
+      font-weight: 800;
+      font-size: 0.8rem;
+    }
+
+    .table-container { overflow-x: auto; margin-top: 15px; }
+    
+    table { 
+      border-collapse: collapse; 
+      width: 100%; 
+      min-width: 550px;
+    }
+
+    th { 
+      background: #f8fafc; 
+      color: #64748b; 
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      padding: 12px;
+    }
+
+    td { 
+      padding: 14px; 
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.9rem;
+    }
+
+    .critical-row { background-color: #fff5f5 !important; color: #c53030; font-weight: 600; }
+    
+    canvas { margin-top: 25px; min-height: 250px; }
+
+    .footer { text-align: center; color: #94a3b8; font-size: 0.8rem; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h2><i class="fas fa-chart-line"></i> Simulasi Populasi Tikus</h2>
+    
+    <div class="grid-input">
+      <div class="input-group full-width">
+        <label>Pilih Kondisi Lahan (Skenario):</label>
+        <select id="skenario" onchange="updateBySkenario()">
+          <option value="alami">🔴 Tanpa Pengendalian (Lahan Kotor/Bera Lama)</option>
+          <option value="sedang">🟡 Pengendalian Parsial (Hanya Racun/Umpan)</option>
+          <option value="pht">🟢 Pengendalian Terpadu (Sanitasi/Gropyokan/TBS)</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>Luas Lahan (ha)</label>
+        <input type="number" id="luas" value="1" min="1">
+      </div>
+      <div class="input-group">
+        <label>Laju Pertumbuhan (r)</label>
+        <input type="number" id="r" step="0.1" value="0.8">
+      </div>
+      <div class="input-group">
+        <label>Durasi (minggu)</label>
+        <input type="number" id="t" value="16">
+      </div>
+      <div class="input-group">
+        <label>Efikasi Kendali (%)</label>
+        <input type="number" id="kill" value="5">
+      </div>
+    </div>
+
+    <button onclick="jalankanSimulasi()"><i class="fas fa-play-circle"></i> Hitung Proyeksi Hama</button>
+    
+    <div id="hasilSimulasi" class="info-box" style="display:none"></div>
+    <canvas id="ratChart"></canvas>
+  </div>
+
+  <div class="card">
+    <h2><i class="fas fa-calendar-check"></i> Rencana Tindakan Lapangan</h2>
+    <div class="input-group">
+      <label>Tanggal Mulai Tanam:</label>
+      <input type="date" id="tglTanam" onchange="generateKalender()">
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Minggu</th>
+            <th>Estimasi Tanggal</th>
+            <th>Tindakan Rekomendasi PPL</th>
+          </tr>
+        </thead>
+        <tbody id="tabelKalender">
+          <tr><td colspan="3" style="text-align:center; color:#aaa;">Pilih tanggal tanam untuk melihat jadwal</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    Digital Tool PPL - Kecamatan Bola, Kab. Wajo
+  </div>
+</div>
+
+<script>
+let myChart;
+
+function updateBySkenario() {
+  const skenario = document.getElementById('skenario').value;
+  const rInput = document.getElementById('r');
+  const killInput = document.getElementById('kill');
+
+  if (skenario === 'alami') {
+    rInput.value = 0.8;
+    killInput.value = 5;
+  } else if (skenario === 'sedang') {
+    rInput.value = 0.5;
+    killInput.value = 30;
+  } else if (skenario === 'pht') {
+    rInput.value = 0.2;
+    killInput.value = 70;
+  }
+}
+
+function jalankanSimulasi() {
+  const luas = parseFloat(document.getElementById('luas').value);
+  const r = parseFloat(document.getElementById('r').value);
+  const t = parseInt(document.getElementById('t').value);
+  const kill = parseFloat(document.getElementById('kill').value) / 100;
+
+  if (!luas || !r || !t) return alert("Mohon lengkapi data input!");
+
+  const nAwalPerHa = 4;
+  const nMaksPerHa = 400;
+
+  let n0 = luas * nAwalPerHa;
+  let k = luas * nMaksPerHa;
+
+  let dataPopulasi = [];
+  let labels = [];
+  let Nt = n0;
+
+  for (let i = 0; i <= t; i++) {
+    labels.push("Mg-" + i);
+    dataPopulasi.push(Math.round(Nt));
+
+    // ✅ PERBAIKAN LOGIKA DI SINI
+    let Nt_kendali = Nt * (1 - kill);
+    let Nt_next = Nt_kendali + (r * Nt_kendali * (1 - (Nt_kendali / k)));
+
+    Nt = Nt_next;
+
+    // Pembatas biologis
+    if (Nt > k) Nt = k;
+    if (Nt < 0) Nt = 0;
+  }
+
+  const box = document.getElementById('hasilSimulasi');
+  box.style.display = 'block';
+
+  let status, warna;
+  const akhir = dataPopulasi[dataPopulasi.length - 1];
+
+  if (akhir > 0.6 * k) { status = "BAHAYA"; warna = "#d32f2f"; }
+  else if (akhir > 0.2 * k) { status = "WASPADA"; warna = "#ffa000"; }
+  else { status = "AMAN"; warna = "#2e7d32"; }
+
+  box.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span>Populasi Akhir: <b>${akhir}</b> ekor</span>
+      <span class="status-badge" style="background:${warna}">${status}</span>
+    </div>
+    <p style="margin: 8px 0 0 0; font-size:0.85rem; color:#666;">
+      Lahan seluas ${luas} ha memiliki ambang batas maksimal sekitar ${Math.round(k)} ekor.
+    </p>
+  `;
+
+  if (myChart) myChart.destroy();
+  const ctx = document.getElementById('ratChart').getContext('2d');
+  myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Jumlah Tikus',
+        data: dataPopulasi,
+        borderColor: warna,
+        backgroundColor: warna + '15',
+        fill: true,
+        tension: 0.4,
+        borderWidth: 3,
+        pointRadius: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
+</script>
+</body>
+</html>
