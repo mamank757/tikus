@@ -37,7 +37,7 @@
 
     h2 { 
       color: var(--primary); 
-      margin-top: 0; 
+      margin: 0 0 15px 0;
       display: flex; 
       align-items: center; 
       gap: 12px;
@@ -71,6 +71,9 @@
 
     select:focus, input:focus { border-color: var(--primary); background: #f9fff9; }
 
+    /* Gaya untuk input saat error */
+    .input-error { border-color: var(--danger) !important; background-color: #fff5f5 !important; }
+
     .full-width { grid-column: 1 / -1; }
 
     button { 
@@ -88,7 +91,6 @@
     }
 
     button:hover { background: var(--secondary); transform: translateY(-2px); }
-    button:active { transform: translateY(0); }
 
     .info-box { 
       background: #f0fdf4; 
@@ -108,31 +110,18 @@
 
     .table-container { overflow-x: auto; margin-top: 15px; }
     
-    table { 
-      border-collapse: collapse; 
-      width: 100%; 
-      min-width: 550px;
-    }
-
-    th { 
-      background: #f8fafc; 
-      color: #64748b; 
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 0.7rem;
-      letter-spacing: 1px;
-      padding: 12px;
-    }
-
-    td { 
-      padding: 14px; 
-      border-bottom: 1px solid #f1f5f9;
-      font-size: 0.9rem;
-    }
+    table { border-collapse: collapse; width: 100%; min-width: 550px; }
+    th { background: #f8fafc; color: #64748b; font-size: 0.7rem; padding: 12px; text-transform: uppercase; }
+    td { padding: 14px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
 
     .critical-row { background-color: #fff5f5 !important; color: #c53030; font-weight: 600; }
     
-    canvas { margin-top: 25px; min-height: 250px; }
+    .chart-container {
+      position: relative;
+      margin-top: 20px;
+      height: 220px;
+      width: 100%;
+    }
 
     .footer { text-align: center; color: #94a3b8; font-size: 0.8rem; margin-top: 20px; }
   </style>
@@ -147,23 +136,24 @@
       <div class="input-group full-width">
         <label>Pilih Kondisi Lahan (Skenario):</label>
         <select id="skenario" onchange="updateBySkenario()">
-          <option value="alami">🔴 Tanpa Pengendalian (Lahan Kotor/Bera Lama)</option>
-          <option value="sedang">🟡 Pengendalian Parsial (Hanya Racun/Umpan)</option>
-          <option value="pht">🟢 Pengendalian Terpadu (Sanitasi/Gropyokan/TBS)</option>
+          <option value="alami">🔴 Tanpa Pengendalian (Risiko Ledakan Tinggi)</option>
+          <option value="setelah_tanam">🟠 Pengendalian Setelah Tanam (Racun/Perangkap Rutin)</option>
+          <option value="sebelum_olah">🟡 Pengendalian Sebelum Olah Lahan (Gropyokan/Umpan)</option>
+          <option value="pht">🟢 Pengendalian Terpadu (PHT - Strategi Lengkap)</option>
         </select>
       </div>
 
       <div class="input-group">
-        <label>Luas Lahan (ha)</label>
-        <input type="number" id="luas" value="1" min="1">
+        <label>Masukkan Luas Lahan (ha)</label>
+        <input type="number" id="luas" placeholder="Contoh: 0.5" min="0" step="any">
       </div>
       <div class="input-group">
-        <label>Laju Pertumbuhan (r)</label>
-        <input type="number" id="r" step="0.1" value="0.8">
+        <label>Laju Pertumbuhan Tikus (r)</label>
+        <input type="number" id="r" step="0.1" value="0.9">
       </div>
       <div class="input-group">
         <label>Durasi (minggu)</label>
-        <input type="number" id="t" value="16">
+        <input type="number" id="t" value="16" min="1">
       </div>
       <div class="input-group">
         <label>Efikasi Kendali (%)</label>
@@ -174,7 +164,10 @@
     <button onclick="jalankanSimulasi()"><i class="fas fa-play-circle"></i> Hitung Proyeksi Hama</button>
     
     <div id="hasilSimulasi" class="info-box" style="display:none"></div>
-    <canvas id="ratChart"></canvas>
+    
+    <div class="chart-container">
+      <canvas id="ratChart"></canvas>
+    </div>
   </div>
 
   <div class="card">
@@ -200,9 +193,7 @@
     </div>
   </div>
 
-  <div class="footer">
-    Digital Tool PPL - Kecamatan Bola, Kab. Wajo
-  </div>
+  <div class="footer">Digital Tool PPL - Kecamatan Bola, Kab. Wajo</div>
 </div>
 
 <script>
@@ -213,70 +204,80 @@ function updateBySkenario() {
   const rInput = document.getElementById('r');
   const killInput = document.getElementById('kill');
 
-  if (skenario === 'alami') {
-    rInput.value = 0.8;
-    killInput.value = 5;
-  } else if (skenario === 'sedang') {
-    rInput.value = 0.5;
-    killInput.value = 30;
-  } else if (skenario === 'pht') {
-    rInput.value = 0.2;
-    killInput.value = 70;
+  switch (skenario) {
+    case 'alami':
+      rInput.value = 0.9;
+      killInput.value = 5; 
+      break;
+    case 'sebelum_olah':
+      rInput.value = 0.75;
+      killInput.value = 35;
+      break;
+    case 'setelah_tanam':
+      rInput.value = 0.6;
+      killInput.value = 25;
+      break;
+    case 'pht':
+      rInput.value = 0.3;
+      killInput.value = 60;
+      break;
   }
 }
 
 function jalankanSimulasi() {
-  const luas = parseFloat(document.getElementById('luas').value);
+  const luasInput = document.getElementById('luas');
+  const luas = parseFloat(luasInput.value);
   const r = parseFloat(document.getElementById('r').value);
   const t = parseInt(document.getElementById('t').value);
   const kill = parseFloat(document.getElementById('kill').value) / 100;
 
-  if (!luas || !r || !t) return alert("Mohon lengkapi data input!");
+  // Reset status error
+  luasInput.classList.remove('input-error');
 
-  const nAwalPerHa = 4;
-  const nMaksPerHa = 400;
+  // Validasi Luas Lahan (Peringatan jika 0, kosong, atau negatif)
+  if (isNaN(luas) || luas <= 0) {
+    luasInput.classList.add('input-error');
+    luasInput.focus();
+    return alert("⚠️ Peringatan: Luas lahan tidak boleh 0 atau kosong. Masukkan nilai luas lahan yang valid (misalnya: 0.5 atau 1).");
+  }
 
-  let n0 = luas * nAwalPerHa;
+  if (!r || !t) return alert("Mohon lengkapi data laju pertumbuhan dan durasi!");
+
+  const nAwalPerHa = 6; 
+  const nMaksPerHa = 500; 
   let k = luas * nMaksPerHa;
+  let Nt = luas * nAwalPerHa;
 
   let dataPopulasi = [];
   let labels = [];
-  let Nt = n0;
 
   for (let i = 0; i <= t; i++) {
     labels.push("Mg-" + i);
     dataPopulasi.push(Math.round(Nt));
 
-    // ✅ PERBAIKAN LOGIKA DI SINI
-    let Nt_kendali = Nt * (1 - kill);
-    let Nt_next = Nt_kendali + (r * Nt_kendali * (1 - (Nt_kendali / k)));
+    let populasi_setelah_kendali = Nt * (1 - kill);
+    let pertumbuhan = r * populasi_setelah_kendali * (1 - (populasi_setelah_kendali / k));
+    let imigrasi = 0.5 * luas; 
 
-    Nt = Nt_next;
+    Nt = populasi_setelah_kendali + pertumbuhan + imigrasi;
 
-    // Pembatas biologis
     if (Nt > k) Nt = k;
-    if (Nt < 0) Nt = 0;
+    if (Nt < 1) Nt = 1;
   }
 
   const box = document.getElementById('hasilSimulasi');
   box.style.display = 'block';
-
   let status, warna;
   const akhir = dataPopulasi[dataPopulasi.length - 1];
 
-  if (akhir > 0.6 * k) { status = "BAHAYA"; warna = "#d32f2f"; }
-  else if (akhir > 0.2 * k) { status = "WASPADA"; warna = "#ffa000"; }
+  if (akhir > 0.5 * k) { status = "BAHAYA"; warna = "#d32f2f"; }
+  else if (akhir > 0.15 * k) { status = "WASPADA"; warna = "#ffa000"; }
   else { status = "AMAN"; warna = "#2e7d32"; }
 
-  box.innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center;">
+  box.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;">
       <span>Populasi Akhir: <b>${akhir}</b> ekor</span>
       <span class="status-badge" style="background:${warna}">${status}</span>
-    </div>
-    <p style="margin: 8px 0 0 0; font-size:0.85rem; color:#666;">
-      Lahan seluas ${luas} ha memiliki ambang batas maksimal sekitar ${Math.round(k)} ekor.
-    </p>
-  `;
+    </div>`;
 
   if (myChart) myChart.destroy();
   const ctx = document.getElementById('ratChart').getContext('2d');
@@ -285,21 +286,53 @@ function jalankanSimulasi() {
     data: {
       labels: labels,
       datasets: [{
-        label: 'Jumlah Tikus',
+        label: 'Ekor',
         data: dataPopulasi,
         borderColor: warna,
         backgroundColor: warna + '15',
         fill: true,
         tension: 0.4,
-        borderWidth: 3,
-        pointRadius: 3
+        borderWidth: 2,
+        pointRadius: 2
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true } }
+      scales: { 
+        y: { beginAtZero: true, suggestedMax: k + 10, ticks: { maxTicksLimit: 5 } },
+        x: { ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+function generateKalender() {
+  const tgl = document.getElementById('tglTanam').value;
+  if (!tgl) return;
+  const tglObj = new Date(tgl);
+  const listKegiatan = [
+    "Gropyokan & Bongkar Lubang Aktif", "Sanitasi Pematang/Saluran Irigasi", "Olah Tanah & Penggenangan Sarang",
+    "PENANAMAN SEREMPAK", "Pasang Trap Barrier System (TBS)", "Monitoring Jejak & Umpan Segar",
+    "Fumigasi Sarang (Emposan)", "Sanitasi Gulma Rutin", "WASPADA: Fase Bunting Padi",
+    "Pengendalian Intensif (Umpan Beracun)", "Puncak Kerawanan (Lindungi Malai)", "Monitoring Menjelang Panen",
+    "PANEN & Bersihkan Sisa Jerami", "Gropyokan Pasca Panen", "Bongkar Habitat Sisa"
+  ];
+
+  const tbody = document.getElementById('tabelKalender');
+  tbody.innerHTML = '';
+  listKegiatan.forEach((teks, i) => {
+    let d = new Date(tglObj);
+    d.setDate(tglObj.getDate() + (i - 3) * 7);
+    let row = tbody.insertRow();
+    row.insertCell(0).innerHTML = `<b>Mg ${i + 1}</b>`;
+    row.insertCell(1).innerText = d.toLocaleDateString('id-ID', {day:'2-digit', month:'long'});
+    let cellKeg = row.insertCell(2);
+    cellKeg.innerText = teks;
+    if (i >= 8 && i <= 10) { 
+      row.className = 'critical-row'; 
+      cellKeg.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${teks}`; 
     }
   });
 }
